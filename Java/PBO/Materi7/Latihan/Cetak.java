@@ -19,7 +19,7 @@ public class Cetak {
 
     public static void main(String[] okedroid) {
         //method void main utama
-        Cetak c1 = new Cetak(43, "Fathurrahman");
+        Cetak c1 = new Cetak(43, "Fickry Imamsyah");
         //membuat obyek baru dari constructor Cetak
         c1.tampil();
         //menampilkan method tampil()
