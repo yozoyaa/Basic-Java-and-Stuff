@@ -76,20 +76,32 @@ public class App extends JFrame {
         String nama = txtNama.getText().trim();
         String sks = txtSKS.getText().trim();
         String prasyarat = txtKodePrasyarat.getText().trim();
-
-        String sql = "INSERT INTO matakuliah (Kode_Matakuliah, Nama, SKS, Kode_Prasyarat) VALUES (?, ?, ?, ?)";
-
+    
+        String checkSql = "SELECT COUNT(*) FROM matakuliah WHERE Kode_Matakuliah = ? AND Nama = ? AND SKS = ?";
+    
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, Integer.parseInt(kode));
-            stmt.setString(2, nama);
-            stmt.setInt(3, Integer.parseInt(sks));
-            stmt.setString(4, prasyarat);
-
-            stmt.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Data berhasil ditambahkan", "Sukses", JOptionPane.INFORMATION_MESSAGE);
-            clearFields();
+             PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+            
+            checkStmt.setInt(1, Integer.parseInt(kode));
+            checkStmt.setString(2, nama);
+            checkStmt.setInt(3, Integer.parseInt(sks));
+            
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                JOptionPane.showMessageDialog(this, "Duplicate Data Found, Please Input new data", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                String sql = "INSERT INTO matakuliah (Kode_Matakuliah, Nama, SKS, Kode_Prasyarat) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    stmt.setInt(1, Integer.parseInt(kode));
+                    stmt.setString(2, nama);
+                    stmt.setInt(3, Integer.parseInt(sks));
+                    stmt.setString(4, prasyarat);
+    
+                    stmt.executeUpdate();
+                    JOptionPane.showMessageDialog(this, "Data berhasil ditambahkan", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                    clearFields();
+                }
+            }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error menambahkan data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
